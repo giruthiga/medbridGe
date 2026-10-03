@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-med-black text-med-text antialiased;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+@layer components {
+    /* Glass effect for floating nav */
+    .glass {
+        background: rgba(19, 19, 19, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Glow on hover */
+    .hover-glow {
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .hover-glow:hover {
+        box-shadow: 0 0 30px -8px rgba(16, 185, 129, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #0a0a0a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #222;
+        border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #333;
+    }
+
+    /* Bento card */
+    .bento-card {
+        @apply bg-med-card border border-med-border rounded-2xl p-6 transition-all;
+    }
+
+    .bento-card:hover {
+        @apply border-med-green/30;
+    }
+}
