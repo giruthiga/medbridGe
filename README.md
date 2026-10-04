@@ -220,20 +220,5 @@ This project is open source and available for educational and portfolio purposes
 Built to solve a real business problem — hospital data migration friction.
 ```
 
----
 
-## Steps to Add It
-
-1. **In VS Code** — right-click the project root (where `artisan` lives) → **New File** → name it `README.md`
-2. **Paste** the content above
-3. **Save** (Ctrl+S)
-4. **In terminal:**
-
-```bash
-git add README.md
-git commit -m "Add README"
-git push
-```
-
----
 
