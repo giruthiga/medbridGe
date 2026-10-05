@@ -32,7 +32,7 @@
         ];
 
         $recommendations = [];
-        foreach ($report->breakdown as $key => $factor) {
+        foreach ($factors as $key => $factor) {
             if ($factor['score'] < 90) {
                 $suggestion = match($key) {
                     'coverage' => 'Map more standard fields to boost coverage.',
@@ -104,7 +104,6 @@
                 Download JSON
             </button>
 
-            {{-- NEW: Export & Gap Analysis --}}
             <a href="{{ $exportUrl }}"
                style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; background-color: #c084fc; color: #000; font-size: 13px; font-weight: 700; text-decoration: none; transition: all 0.2s;"
                onmouseover="this.style.backgroundColor='#d8b4fe'; this.style.transform='translateY(-1px)';"
@@ -126,6 +125,16 @@
             </a>
         </div>
     </div>
+
+    {{-- Coverage Cap Banner --}}
+    @if($coverageCap && ($coverageCap['applied'] ?? false))
+        <div style="background:#3a2a00; border:1px solid #6b4a00; color:#fbbf24; padding:14px 18px; border-radius:12px; margin-bottom:24px; font-size:14px; display:flex; align-items:center; gap:10px;">
+            <svg style="width:18px; height:18px; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-3L13.74 4a2 2 0 00-3.48 0L3.34 16a2 2 0 001.73 3z" />
+            </svg>
+            <span><strong>Coverage cap applied:</strong> {{ $coverageCap['detail'] }}</span>
+        </div>
+    @endif
 
     {{-- Hero Score --}}
     <div style="background: linear-gradient(135deg, #131313 0%, #1a1a1a 100%); border: 1px solid {{ $scoreColor }}40; border-radius: 24px; padding: 48px; margin-bottom: 32px; position: relative; overflow: hidden;">
@@ -259,9 +268,7 @@
                         };
                     @endphp
 
-                    <div class="factor-card" data-factor-key="{{ $key }}" data-factor-label="{{ $factor['label'] }}" data-factor-score="{{ $factor['score'] }}" data-factor-weight="{{ $factor['weight'] ?? 0 }}" data-factor-weighted="{{ $factor['weighted'] ?? 0 }}" data-factor-detail="{{ $factor['detail'] }}"
-                     style="background-color: #131313; border: 1px solid #222; border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
-                         style="background-color: #131313; border: 1px solid #222; border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div class="factor-card" data-factor-key="{{ $key }}" data-factor-label="{{ $factor['label'] }}" data-factor-score="{{ $factor['score'] }}" data-factor-weight="{{ $factor['weight'] ?? 0 }}" data-factor-weighted="{{ $factor['weighted'] ?? 0 }}" data-factor-detail="{{ $factor['detail'] }}" style="background-color: #131313; border: 1px solid #222; border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;">
                                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -310,7 +317,7 @@
             <div style="background-color: #131313; border: 1px solid #222; border-radius: 16px; padding: 24px; flex: 1; display: flex; flex-direction: column;">
                 @php
                     $radarData = [];
-                    foreach ($report->breakdown as $key => $factor) {
+                    foreach ($factors as $key => $factor) {
                         $radarData[] = [
                             'key' => $key,
                             'label' => $factor['label'],
@@ -614,7 +621,6 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // ========== Animate score ring ==========
             const ring = document.getElementById('scoreRing');
             const scoreNum = document.getElementById('scoreNumber');
             if (ring && scoreNum) {
@@ -636,14 +642,12 @@
                 requestAnimationFrame(tick);
             }
 
-            // ========== Animate factor bars ==========
             setTimeout(() => {
                 document.querySelectorAll('[data-bar-width]').forEach(bar => {
                     bar.style.width = bar.dataset.barWidth + '%';
                 });
             }, 200);
 
-            // ========== Copy score ==========
             document.getElementById('copyScoreBtn')?.addEventListener('click', (e) => {
                 const text = `medbridGe Readiness Score: {{ $score }}% — {{ $scoreLabel }}\n{{ $report->summary }}`;
                 navigator.clipboard.writeText(text);
@@ -653,7 +657,6 @@
                 setTimeout(() => { btn.innerHTML = original; }, 1500);
             });
 
-            // ========== Download report ==========
             document.getElementById('downloadBtn')?.addEventListener('click', () => {
                 const report = {
                     filename: '{{ $upload->original_filename }}',
@@ -673,14 +676,12 @@
                 URL.revokeObjectURL(url);
             });
 
-            // ========== Keyboard shortcuts ==========
             document.addEventListener('keydown', (e) => {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 if (e.key === 'c' || e.key === 'C') document.getElementById('copyScoreBtn')?.click();
                 if (e.key === 'd' || e.key === 'D') document.getElementById('downloadBtn')?.click();
             });
 
-            // ========== Band click ==========
             const bands = @json($bands);
             document.querySelectorAll('.band-segment').forEach(seg => {
                 seg.addEventListener('click', () => {
@@ -693,7 +694,6 @@
                 });
             });
 
-            // ========== Factor card click → modal ==========
             const modal = document.getElementById('factorModal');
             document.querySelectorAll('.factor-card').forEach(card => {
                 card.addEventListener('click', () => {
@@ -720,7 +720,6 @@
             document.getElementById('factorModalOverlay')?.addEventListener('click', () => modal.style.display = 'none');
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.style.display = 'none'; });
 
-            // ========== Radar point click ==========
             document.querySelectorAll('.radar-point').forEach(point => {
                 point.addEventListener('click', () => {
                     const label = point.dataset.label;
@@ -734,7 +733,6 @@
                 });
             });
 
-            // ========== What-If Simulator ==========
             const baseScore = {{ $score }};
             const potentialEl = document.getElementById('potentialScore');
             const deltaEl = document.getElementById('potentialDelta');
