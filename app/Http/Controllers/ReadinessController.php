@@ -37,6 +37,13 @@ class ReadinessController extends Controller
                 ->with('error', 'No readiness report yet. Click "Score Readiness" first.');
         }
 
-        return view('readiness.show', compact('upload', 'report'));
+        // 'coverage_cap' is a ceiling, not a weighted factor — keep it out of the card grid.
+        $factors = collect($report->breakdown ?? [])
+            ->except('coverage_cap')
+            ->all();
+
+        $coverageCap = $report->breakdown['coverage_cap'] ?? null;
+
+        return view('readiness.show', compact('upload', 'report', 'factors', 'coverageCap'));
     }
 }

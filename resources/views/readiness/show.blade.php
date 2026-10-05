@@ -243,7 +243,7 @@
             </h2>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1;" class="breakdown-grid">
-                @foreach($report->breakdown as $key => $factor)
+                @foreach($factors as $key => $factor)
                     @php
                         $barColor = match(true) {
                             $factor['score'] >= 80 => '#10b981',
@@ -259,7 +259,8 @@
                         };
                     @endphp
 
-                    <div class="factor-card" data-factor-key="{{ $key }}" data-factor-label="{{ $factor['label'] }}" data-factor-score="{{ $factor['score'] }}" data-factor-weight="{{ $factor['weight'] }}" data-factor-weighted="{{ $factor['weighted'] }}" data-factor-detail="{{ $factor['detail'] }}"
+                    <div class="factor-card" data-factor-key="{{ $key }}" data-factor-label="{{ $factor['label'] }}" data-factor-score="{{ $factor['score'] }}" data-factor-weight="{{ $factor['weight'] ?? 0 }}" data-factor-weighted="{{ $factor['weighted'] ?? 0 }}" data-factor-detail="{{ $factor['detail'] }}"
+                     style="background-color: #131313; border: 1px solid #222; border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
                          style="background-color: #131313; border: 1px solid #222; border-radius: 16px; padding: 24px; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;">
